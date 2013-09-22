@@ -17,11 +17,11 @@ class SuperScanner(object):
         return len(self.scanned_files) + 1
 
     def scan_page(self):
-        page_name = os.path.join(self.tmp_folder, "scan_%d.png" % self.get_next_index())
+        page_name = os.path.join(self.tmp_folder, "scan_%d.jpg" % self.get_next_index())
 
         scanimage = subprocess.Popen(('scanimage', '--resolution', '300', '--source',
             'Automatic Document Feeder'), stdout=subprocess.PIPE)
-        convert = subprocess.Popen(('convert', '-', page_name), stdin=scanimage.stdout,
+        convert = subprocess.Popen(('convert', '-', '-quality', '80', page_name), stdin=scanimage.stdout,
             stdout=sys.stdout)
         scanimage.wait()
         convert.wait()
