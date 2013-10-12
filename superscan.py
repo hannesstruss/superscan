@@ -16,11 +16,13 @@ class SuperScanner(object):
     def get_next_index(self):
         return len(self.scanned_files) + 1
 
-    def scan_page(self):
+    def scan_page(self, flatbed=False):
         page_name = os.path.join(self.tmp_folder, "scan_%d.jpg" % self.get_next_index())
 
+        source = 'Flatbed' if flatbed else 'Automatic Document Feeder'
+
         scanimage = subprocess.Popen(('scanimage', '--resolution', '300', '--source',
-            'Automatic Document Feeder'), stdout=subprocess.PIPE)
+            source), stdout=subprocess.PIPE)
         convert = subprocess.Popen(('convert', '-', '-quality', '80', page_name), stdin=scanimage.stdout,
             stdout=sys.stdout)
         scanimage.wait()
@@ -37,7 +39,8 @@ class ScannerUI(object):
     INTRX = re.compile(r'^\d+$')
     MENU = """\
 1. Enter an integer to scan N pages
-2. Enter 'pdf' to generate the PDF"""
+2. Enter f to scan one page from the flatbed
+3. Enter 'pdf' to generate the PDF"""
 
     def __init__(self):
         self.scanner = SuperScanner()
@@ -70,6 +73,10 @@ class ScannerUI(object):
                     print("Page %d in the works, sir!" %
                         self.scanner.get_next_index())
                     self.scanner.scan_page()
+                print("\nAlright! What now?")
+                print(self.MENU)
+            elif cmd == "f":
+                self.scanner.scan_page(flatbed=True)
                 print("\nAlright! What now?")
                 print(self.MENU)
             elif cmd == "kthx":
